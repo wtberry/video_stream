@@ -1,5 +1,6 @@
 # module for pose estimation
 # for video implementation
+from os import stat
 import cv2
 import mediapipe as mp
 import numpy as np
@@ -17,6 +18,8 @@ class PoseEstimator(object):
     Return result obj from mp.pose api
 
     Args:
+        - static_image_mode: if false, treat images as video frames.
+        - model_complexity: 0~2, the number increase, so does model's complexity, accuracy and processing time
         - min_detection_confidence:
         - min_tracking_confidence:
         - preprocesing: function to be passed. takes in image
@@ -24,13 +27,16 @@ class PoseEstimator(object):
     """
     
     def __init__(
-        self, min_detection_confidence=0.5, min_tracking_confidence=0.5, 
+        self, static_image_mode=False, model_complexity=1, 
+        min_detection_confidence=0.5, min_tracking_confidence=0.5, 
         preprocessing=None, flip=True
         ) -> None:
 
         self.pose = mp_pose.Pose(
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5
+            static_image_mode=static_image_mode,
+            min_detection_confidence=min_detection_confidence,
+            min_tracking_confidence=min_tracking_confidence,
+            model_complexity=model_complexity
         )
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_drawing_styles = mp.solutions.drawing_styles

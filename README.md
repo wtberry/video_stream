@@ -83,3 +83,41 @@ and drawing result annotation on the image and displaying it on Flask
 - [how to decode image bytes on cv2](https://stackoverflow.com/questions/17170752/python-opencv-load-image-from-byte-string)
 
 Use pose_estimator.py file module.
+
+### optimization
+Timelag is big issue. as time since camera stream's start increase, the more time lag between 
+stream and action. 
+
+2 sources of lags. Kafka and mediapipe's ML model. 
+
+**Kafka**
+
+Ran the stream app without the ML model, and lag was there but not too much and 
+did not increase overtime. Hence the major cause of the lag increase is mediapipe ML.
+
+However modify following params in producer.properties
+* acks=0
+* linger.ms=0 (don't wait for batches)
+
+**MediaPipe ML**
+
+according to [the website](https://google.github.io/mediapipe/solutions/pose.html), model takes 20~30ms to process one frame. 
+Pi's camera produce 30 frames per seconds, so this is a significant problem. 
+
+**Solution**
+
+Would be 
+* to only process 1 frames per every 20~30 ms. 
+* Use smaller model
+
+Using smaller model didn't make significant difference. 
+
+Working solution is to
+* set frame_rate parameters to both producer and consumer app. 
+* setitng the rate to 10 (process only every 10 frames)
+
+On producer, set frame_rate=10 (less smooth footage) and consumer, set it to 1 (every frame from producer)
+
+Theoretically, ML model has 300ms per frame, giving it enough time.
+
+(Obviously parameter setting should be optimizerd for usage, physical machine used etc.)

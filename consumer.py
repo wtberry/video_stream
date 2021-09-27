@@ -1,5 +1,6 @@
 # kafka consumer & flask server for displaying the received stream
 import datetime
+import time
 import json
 from flask import Flask, Response
 from kafka import KafkaConsumer
@@ -12,7 +13,7 @@ with open("kafka_config.json") as fp:
 
 topic = config['topic']
 bootstrap_server_ip = config['bootstrap_server_ip']
-
+process = True
 
 
 consumer = KafkaConsumer(
@@ -23,8 +24,11 @@ consumer = KafkaConsumer(
 # Set the consumer in a Flask App
 app = Flask(__name__)
 
-pe = PoseEstimator()
-
+pe = PoseEstimator(
+    static_image_mode=False,
+    model_complexity=0
+)
+process_time = []
 @app.route('/video', methods=['GET'])
 def video():
     """
@@ -41,12 +45,20 @@ def get_video_stream():
     Here is where we recieve streamed images from the Kafka Server and convert 
     them to a Flask-readable format.
     """
+    frame_cnt = 0
     for msg in consumer:
-        frame = process_video(msg.value)
-        ret, buffer = cv2.imencode('.jpg', frame)
-        img_bytes = buffer.tobytes()
+        if process and (frame_cnt % config['frame_rate'] == 0):
+            start = time.time()
+            frame = process_video(msg.value)
+            ret, buffer = cv2.imencode('.jpg', frame)
+            img_bytes = buffer.tobytes()
+            end = time.time()
+            print("process_time:", end-start)
+        else:
+            img_bytes = msg.value
         yield (b'--frame\r\n'
                b'Content-Type: image/jpg\r\n\r\n' + img_bytes + b'\r\n\r\n')
+        frame_cnt += 1
 
 def process_video(frame):
     """

@@ -3,9 +3,16 @@ import sys
 import time
 import cv2
 from kafka import KafkaProducer
+import json
 
-topic = "pi-video1"
-bootstrap_server_ip = 'localhost'
+with open("kafka_config.json") as fp:
+    config = json.load(fp)
+
+topic = config['topic']
+bootstrap_server_ip = config['bootstrap_server_ip']
+
+
+
 
 def publish_video(video_file):
     """
@@ -33,7 +40,6 @@ def publish_video(video_file):
         # Convert image to png
         ret, buffer = cv2.imencode('.jpg', frame)
 
-
         # Convert to bytes and send to kafka
         producer.send(topic, buffer.tobytes())
 
@@ -53,18 +59,20 @@ def publish_camera():
 
 
     camera = cv2.VideoCapture(0)
+    frame_cnt = 0
     try:
         while(True):
             success, frame = camera.read()
-
-            ret, buffer = cv2.imencode('.jpg', frame)
-            producer.send(topic, buffer.tobytes())
+            if frame_cnt % config['frame_rate'] == 0:
+                ret, buffer = cv2.imencode('.jpg', frame)
+                producer.send(topic, buffer.tobytes())
+            frame_cnt += 1
 
             # Choppier stream, reduced load on processor
-            time.sleep(0.5)
+            #time.sleep(0.5)
 
-    except:
-        print("\nExiting.")
+    except Exception as e:
+        print("\nExiting.", e)
         sys.exit(1)
 
 

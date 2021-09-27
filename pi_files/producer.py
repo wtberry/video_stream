@@ -4,8 +4,8 @@ import time
 import cv2
 from kafka import KafkaProducer
 
-topic = "pi-cam1"
-bootstrap_server_ip = 'ec2-44-193-200-6.compute-1.amazonaws.com'
+topic = "pi-video1"
+bootstrap_server_ip = 'localhost'
 
 def publish_video(video_file):
     """
@@ -32,6 +32,7 @@ def publish_video(video_file):
 
         # Convert image to png
         ret, buffer = cv2.imencode('.jpg', frame)
+
 
         # Convert to bytes and send to kafka
         producer.send(topic, buffer.tobytes())

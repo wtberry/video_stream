@@ -74,3 +74,12 @@ Follow the procedures
     * port # 
     * topic name
 5. start the python script for consumer / Flask
+
+
+## MediaPipe 
+
+Will be processing the video stream from pi -> localPC, performing pose estimation using mediapipe, 
+and drawing result annotation on the image and displaying it on Flask
+- [how to decode image bytes on cv2](https://stackoverflow.com/questions/17170752/python-opencv-load-image-from-byte-string)
+
+Use pose_estimator.py file module.

@@ -7,17 +7,24 @@ This repo should be located under main kafka dir, which was created when you ins
 
 **Dir structure**
 
-kafka
+kafka/
  * other kafka dir and files..
  * video_stream/ (this dir)
     * ec2_files/
         * consumer.py
+        * pose_estimator.py
         * kafka_client_config.json
     * pi_files/
         * kafka_ec2_config.json
         * producer.py
         * producer.properties
 
+## TODO
+* README refinement
+    * [ ] details of dir and files
+    * [ ] setup procedures for pi and ec2
+* increase # of camera 
+    * [ ] figure out what's needed 
 
 ## Pi & Laptop Testrun
 

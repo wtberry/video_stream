@@ -1,5 +1,8 @@
 {
-    "topic":"pi-video1",
-    "bootstrap_server_ip":"192.168.0.105",
-    "frame_rate":1
+    "topic":"pi-cam1",
+    "bootstrap_server_ip":"ip-172-31-11-251.ec2.internal",
+    "port":19092,
+    "frame_rate":1,
+    "model_complexity":1,
+    "process":true
 }

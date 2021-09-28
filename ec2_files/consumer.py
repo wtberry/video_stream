@@ -8,17 +8,18 @@ from pose_estimator import PoseEstimator
 import numpy as np
 import cv2
 
-with open("kafka_config.json") as fp:
+with open("kafka_client_config.json") as fp:
     config = json.load(fp)
 
 topic = config['topic']
 bootstrap_server_ip = config['bootstrap_server_ip']
-process = True
+port = config['port']
+process = config['process']
 
 
 consumer = KafkaConsumer(
     topic, 
-    bootstrap_servers=['{}:9092'.format(bootstrap_server_ip)])
+    bootstrap_servers=['{}:{}'.format(bootstrap_server_ip, port)])
 
 
 # Set the consumer in a Flask App
@@ -71,4 +72,4 @@ def process_video(frame):
     return annotated_frame
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', debug=True)
+    app.run(host='0.0.0.0', debug=True)

@@ -26,7 +26,7 @@ app = Flask(__name__)
 
 pe = PoseEstimator(
     static_image_mode=False,
-    model_complexity=0
+    model_complexity=config['model_complexity']
 )
 process_time = []
 @app.route('/video', methods=['GET'])

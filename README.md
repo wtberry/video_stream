@@ -88,6 +88,7 @@ Use pose_estimator.py file module.
 Timelag is big issue. as time since camera stream's start increase, the more time lag between 
 stream and action. 
 
+
 2 sources of lags. Kafka and mediapipe's ML model. 
 
 **Kafka**
@@ -98,6 +99,8 @@ did not increase overtime. Hence the major cause of the lag increase is mediapip
 However modify following params in producer.properties
 * acks=0
 * linger.ms=0 (don't wait for batches)
+
+[kafka optimization - cofluent](https://docs.confluent.io/cloud/current/client-apps/optimizing/latency.html)
 
 **MediaPipe ML**
 

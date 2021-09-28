@@ -1,5 +1,9 @@
-# Kafka Experiment Note
+# Rasbperry Pi video stream and Processing with Kafka
 
+## Setup
+**Under construction**
+
+This repo should be located under main kafka dir.
 
 ## Pi & Laptop Testrun
 

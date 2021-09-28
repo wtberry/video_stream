@@ -1,20 +1,34 @@
-# kafka consumer client and Flask 
+# kafka consumer & flask server for displaying the received stream
 import datetime
+import time
+import json
 from flask import Flask, Response
 from kafka import KafkaConsumer
+from pose_estimator import PoseEstimator
+import numpy as np
+import cv2
 
-# Fire up the Kafka Consumer
-topic = "pi-cam1"
-bootstrap_server = 'ip-172-31-11-251.ec2.internal'
+with open("kafka_config.json") as fp:
+    config = json.load(fp)
+
+topic = config['topic']
+bootstrap_server_ip = config['bootstrap_server_ip']
+process = True
+
 
 consumer = KafkaConsumer(
     topic, 
-    bootstrap_servers=['{}:19092'.format(bootstrap_server)])
+    bootstrap_servers=['{}:9092'.format(bootstrap_server_ip)])
 
 
 # Set the consumer in a Flask App
 app = Flask(__name__)
 
+pe = PoseEstimator(
+    static_image_mode=False,
+    model_complexity=config['model_complexity']
+)
+process_time = []
 @app.route('/video', methods=['GET'])
 def video():
     """
@@ -31,9 +45,30 @@ def get_video_stream():
     Here is where we recieve streamed images from the Kafka Server and convert 
     them to a Flask-readable format.
     """
+    frame_cnt = 0
     for msg in consumer:
+        if process and (frame_cnt % config['frame_rate'] == 0):
+            start = time.time()
+            frame = process_video(msg.value)
+            ret, buffer = cv2.imencode('.jpg', frame)
+            img_bytes = buffer.tobytes()
+            end = time.time()
+            print("process_time:", end-start)
+        else:
+            img_bytes = msg.value
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpg\r\n\r\n' + msg.value + b'\r\n\r\n')
+               b'Content-Type: image/jpg\r\n\r\n' + img_bytes + b'\r\n\r\n')
+        frame_cnt += 1
+
+def process_video(frame):
+    """
+    given video frame, perform pose estimation and return annotated frame
+    """
+    nparr = np.fromstring(frame, np.uint8)
+    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    results = pe.process_image(image)
+    annotated_frame = pe.draw_pose_annotation(image, results)
+    return annotated_frame
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='127.0.0.1', debug=True)

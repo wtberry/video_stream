@@ -1,0 +1,5 @@
+{
+    "topic":"pi-video1",
+    "bootstrap_server_ip":"192.168.0.105",
+    "frame_rate":1
+}

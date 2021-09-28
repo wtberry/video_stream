@@ -3,7 +3,21 @@
 ## Setup
 **Under construction**
 
-This repo should be located under main kafka dir.
+This repo should be located under main kafka dir, which was created when you installed kafka.
+
+**Dir structure**
+
+kafka
+ * other kafka dir and files..
+ * video_stream/ (this dir)
+    * ec2_files/
+        * consumer.py
+        * kafka_client_config.json
+    * pi_files/
+        * kafka_ec2_config.json
+        * producer.py
+        * producer.properties
+
 
 ## Pi & Laptop Testrun
 
